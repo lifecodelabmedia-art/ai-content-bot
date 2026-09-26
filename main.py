@@ -34,7 +34,7 @@ DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
 TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 GEMINI_API = (
     f"https://generativelanguage.googleapis.com/v1beta/models/"
-    f"{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+    f"{GEMINI_MODEL}:generateContent"
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -89,7 +89,8 @@ EDIT_PROMPT = """هذه نسخة سابقة من منشور تم توليده:
 
 def call_gemini(prompt: str) -> str:
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
-    resp = requests.post(GEMINI_API, json=payload, timeout=60)
+    headers = {"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
+    resp = requests.post(GEMINI_API, json=payload, headers=headers, timeout=60)
     resp.raise_for_status()
     data = resp.json()
     return data["candidates"][0]["content"]["parts"][0]["text"].strip()
